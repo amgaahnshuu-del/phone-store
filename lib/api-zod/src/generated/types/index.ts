@@ -6,11 +6,16 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './authUser';
 export * from './cartItem';
 export * from './cartItemInput';
 export * from './category';
 export * from './healthStatus';
 export * from './listPhonesParams';
+export * from './loginInput';
+export * from './order';
+export * from './orderItem';
+export * from './orderStatusInput';
 export * from './phone';
 export * from './phoneInput';
 export * from './storeStats';

@@ -1,16 +1,21 @@
+import { useState } from "react";
 import { useGetCart, useRemoveFromCart, getGetCartQueryKey } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
+import { Loader2, Trash2, ArrowRight, ShoppingBag, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Cart() {
   const { data: cartItems, isLoading } = useGetCart();
   const removeMutation = useRemoveFromCart();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
+  const [placing, setPlacing] = useState(false);
 
   const handleRemove = (id: number) => {
     removeMutation.mutate(
@@ -24,6 +29,34 @@ export default function Cart() {
     );
   };
 
+  const handlePlaceOrder = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setPlacing(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Захиалга хийхэд алдаа гарлаа");
+      }
+      queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
+      toast({
+        title: "Захиалга амжилттай хийгдлээ!",
+        description: "Таны захиалга хүлээгдэж байна. Захиалгуудаас мөрдөж болно.",
+      });
+      navigate("/orders");
+    } catch (err: any) {
+      toast({ title: "Алдаа", description: err.message, variant: "destructive" });
+    } finally {
+      setPlacing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -33,9 +66,7 @@ export default function Cart() {
   }
 
   const isEmpty = !cartItems || cartItems.length === 0;
-  
   const subtotal = cartItems?.reduce((acc, item) => acc + (item.phone.price * item.quantity), 0) || 0;
-  const total = subtotal; // add tax/shipping if needed
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -67,13 +98,13 @@ export default function Cart() {
                   className="bg-card border border-white/5 rounded-2xl p-4 flex gap-4 md:gap-6 items-center"
                 >
                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-background flex-shrink-0 flex items-center justify-center p-2">
-                    <img 
-                      src={item.phone.imageUrl} 
-                      alt={item.phone.name} 
+                    <img
+                      src={item.phone.imageUrl}
+                      alt={item.phone.name}
                       className="max-h-full object-contain"
                     />
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <Link href={`/phone/${item.phoneId}`} className="hover:text-primary transition-colors">
                       <h3 className="font-bold text-lg md:text-xl truncate">{item.phone.name}</h3>
@@ -83,9 +114,9 @@ export default function Cart() {
                   </div>
 
                   <div className="flex flex-col items-end justify-between self-stretch">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       onClick={() => handleRemove(item.id)}
                       disabled={removeMutation.isPending}
@@ -103,7 +134,7 @@ export default function Cart() {
             <div className="lg:col-span-1">
               <div className="bg-card border border-white/5 rounded-2xl p-6 sticky top-24">
                 <h3 className="text-xl font-bold mb-6 border-b border-white/10 pb-4">Захиалгын мэдээлэл</h3>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Нийт үнэ</span>
@@ -115,16 +146,35 @@ export default function Cart() {
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-4 mb-8 flex justify-between items-center">
+                <div className="border-t border-white/10 pt-4 mb-6 flex justify-between items-center">
                   <span className="font-bold text-lg">Төлөх дүн</span>
                   <span className="font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                    ₮{total.toLocaleString()}
+                    ₮{subtotal.toLocaleString()}
                   </span>
                 </div>
 
-                <Button className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
-                  Худалдан авах
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                {!user && (
+                  <p className="text-sm text-muted-foreground mb-4 text-center">
+                    Захиалга хийхийн тулд{" "}
+                    <Link href="/login" className="text-primary underline">нэвтэрнэ үү</Link>
+                  </p>
+                )}
+
+                <Button
+                  className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl relative overflow-hidden group"
+                  onClick={handlePlaceOrder}
+                  disabled={placing}
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  {placing ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Package className="w-5 h-5 mr-2" />
+                      {user ? "Захиалга хийх" : "Нэвтрэн захиалах"}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

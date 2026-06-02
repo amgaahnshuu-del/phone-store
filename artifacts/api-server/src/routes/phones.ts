@@ -84,6 +84,16 @@ router.post("/phones", async (req, res): Promise<void> => {
   res.status(201).json(GetPhoneResponse.parse(phone));
 });
 
+router.delete("/phones/:id", async (req, res): Promise<void> => {
+  if (!req.session?.userId || req.session?.role !== "admin") {
+    res.status(403).json({ error: "Зөвшөөрөлгүй" });
+    return;
+  }
+  const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+  await db.delete(phonesTable).where(eq(phonesTable.id, id));
+  res.sendStatus(204);
+});
+
 router.get("/phones/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = GetPhoneParams.safeParse({ id: parseInt(raw, 10) });

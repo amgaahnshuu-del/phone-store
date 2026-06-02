@@ -9,7 +9,6 @@ import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -98,6 +97,14 @@ export const GetPhoneResponse = zod.object({
 
 
 /**
+ * @summary Delete a phone (admin only)
+ */
+export const DeletePhoneParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
  * @summary Get featured phones for hero display
  */
 export const GetFeaturedPhonesResponseItem = zod.object({
@@ -123,7 +130,7 @@ export const GetFeaturedPhonesResponse = zod.array(GetFeaturedPhonesResponseItem
 
 
 /**
- * @summary Get store stats (total products, brands, price range)
+ * @summary Get store stats
  */
 export const GetPhoneStatsResponse = zod.object({
   "totalProducts": zod.number(),
@@ -190,6 +197,155 @@ export const AddToCartBody = zod.object({
  */
 export const RemoveFromCartParams = zod.object({
   "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Login
+ */
+export const LoginBody = zod.object({
+  "username": zod.string(),
+  "password": zod.string()
+})
+
+export const LoginResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary Get current user
+ */
+export const GetMeResponse = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary List current user's orders
+ */
+export const ListOrdersResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "status": zod.string(),
+  "total": zod.number(),
+  "createdAt": zod.string(),
+  "username": zod.string().nullish(),
+  "items": zod.array(zod.object({
+  "id": zod.number(),
+  "phoneId": zod.number(),
+  "quantity": zod.number(),
+  "price": zod.number(),
+  "phone": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "brand": zod.string(),
+  "price": zod.number(),
+  "originalPrice": zod.number().nullish(),
+  "imageUrl": zod.string(),
+  "imageUrl2": zod.string().nullish(),
+  "imageUrl3": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "specs": zod.string().nullish(),
+  "categoryId": zod.number(),
+  "featured": zod.boolean().optional(),
+  "inStock": zod.boolean().optional(),
+  "rating": zod.number().nullish(),
+  "reviewCount": zod.number().nullish(),
+  "color": zod.string().nullish(),
+  "storage": zod.string().nullish()
+}).optional()
+}))
+})
+export const ListOrdersResponse = zod.array(ListOrdersResponseItem)
+
+
+/**
+ * @summary List all orders (admin)
+ */
+export const ListAllOrdersResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "status": zod.string(),
+  "total": zod.number(),
+  "createdAt": zod.string(),
+  "username": zod.string().nullish(),
+  "items": zod.array(zod.object({
+  "id": zod.number(),
+  "phoneId": zod.number(),
+  "quantity": zod.number(),
+  "price": zod.number(),
+  "phone": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "brand": zod.string(),
+  "price": zod.number(),
+  "originalPrice": zod.number().nullish(),
+  "imageUrl": zod.string(),
+  "imageUrl2": zod.string().nullish(),
+  "imageUrl3": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "specs": zod.string().nullish(),
+  "categoryId": zod.number(),
+  "featured": zod.boolean().optional(),
+  "inStock": zod.boolean().optional(),
+  "rating": zod.number().nullish(),
+  "reviewCount": zod.number().nullish(),
+  "color": zod.string().nullish(),
+  "storage": zod.string().nullish()
+}).optional()
+}))
+})
+export const ListAllOrdersResponse = zod.array(ListAllOrdersResponseItem)
+
+
+/**
+ * @summary Update order status (admin)
+ */
+export const UpdateOrderStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateOrderStatusBody = zod.object({
+  "status": zod.string()
+})
+
+export const UpdateOrderStatusResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "status": zod.string(),
+  "total": zod.number(),
+  "createdAt": zod.string(),
+  "username": zod.string().nullish(),
+  "items": zod.array(zod.object({
+  "id": zod.number(),
+  "phoneId": zod.number(),
+  "quantity": zod.number(),
+  "price": zod.number(),
+  "phone": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "brand": zod.string(),
+  "price": zod.number(),
+  "originalPrice": zod.number().nullish(),
+  "imageUrl": zod.string(),
+  "imageUrl2": zod.string().nullish(),
+  "imageUrl3": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "specs": zod.string().nullish(),
+  "categoryId": zod.number(),
+  "featured": zod.boolean().optional(),
+  "inStock": zod.boolean().optional(),
+  "rating": zod.number().nullish(),
+  "reviewCount": zod.number().nullish(),
+  "color": zod.string().nullish(),
+  "storage": zod.string().nullish()
+}).optional()
+}))
 })
 
 

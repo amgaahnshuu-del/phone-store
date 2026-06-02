@@ -90,6 +90,40 @@ export interface StoreStats {
   inStockCount: number;
 }
 
+export interface LoginInput {
+  username: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  role: string;
+}
+
+export interface OrderItem {
+  id: number;
+  phoneId: number;
+  quantity: number;
+  price: number;
+  phone?: Phone;
+}
+
+export interface Order {
+  id: number;
+  userId: number;
+  status: string;
+  total: number;
+  createdAt: string;
+  /** @nullable */
+  username?: string | null;
+  items: OrderItem[];
+}
+
+export interface OrderStatusInput {
+  status: string;
+}
+
 export type ListPhonesParams = {
 /**
  * @nullable
