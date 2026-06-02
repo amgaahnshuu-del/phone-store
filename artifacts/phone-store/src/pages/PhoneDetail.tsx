@@ -1,19 +1,12 @@
 import { useParams } from "wouter";
-import { Suspense, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
-import { WebGLErrorBoundary } from "@/components/WebGLErrorBoundary";
-import { isWebGLAvailable } from "@/hooks/use-webgl";
+import { useState } from "react";
 import { useGetPhone, useAddToCart, getGetCartQueryKey } from "@workspace/api-client-react";
-import { PhoneModelByType } from "@/components/PhoneModels";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShoppingCart, ShieldCheck, Truck, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-
-const webglAvailable = isWebGLAvailable();
 
 export default function PhoneDetail() {
   const { id } = useParams();
@@ -83,36 +76,14 @@ export default function PhoneDetail() {
         </Link>
 
         <div className="grid md:grid-cols-2 gap-12">
-          {/* 3D Viewer */}
+          {/* Image Viewer */}
           <div className="h-[500px] md:h-[700px] rounded-3xl bg-card border border-white/5 relative overflow-hidden flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-50 blur-3xl pointer-events-none" />
-            
-            {webglAvailable ? (
-              <WebGLErrorBoundary fallback={
-                <div className="w-full h-full flex items-center justify-center">
-                  <img src={phone.imageUrl} alt={phone.name} className="max-h-full object-contain p-8" />
-                </div>
-              }>
-                <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                  <ambientLight intensity={0.5} />
-                  <directionalLight position={[10, 10, 5]} intensity={1} color="#00f0ff" />
-                  <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#b000ff" />
-                  <Suspense fallback={null}>
-                    <PhoneModelByType modelType={phone.modelType} interactive={true} scale={1.2} />
-                    <Environment preset="city" />
-                    <OrbitControls enableZoom={false} autoRotate={false} />
-                  </Suspense>
-                </Canvas>
-              </WebGLErrorBoundary>
-            ) : (
-              <img src={phone.imageUrl} alt={phone.name} className="max-h-full object-contain p-8" />
-            )}
-            
-            {webglAvailable && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm text-muted-foreground bg-background/50 px-4 py-2 rounded-full backdrop-blur-md border border-white/10">
-                Хулганаар чирж эргүүлэх
-              </div>
-            )}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-40 blur-3xl pointer-events-none" />
+            <img
+              src={phone.imageUrl}
+              alt={phone.name}
+              className="relative z-10 max-h-full max-w-full object-contain p-10 drop-shadow-2xl"
+            />
           </div>
 
           {/* Details */}
