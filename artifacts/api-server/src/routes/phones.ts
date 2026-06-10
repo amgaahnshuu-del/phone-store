@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, and, ilike, sql } from "drizzle-orm";
-import { db, phonesTable } from "@workspace/db";
+import { db, phonesTable, cartItemsTable, orderItemsTable } from "@workspace/db";
 import {
   ListPhonesQueryParams,
   CreatePhoneBody,
@@ -90,6 +90,13 @@ router.delete("/phones/:id", async (req, res): Promise<void> => {
     return;
   }
   const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Буруу ID" });
+    return;
+  }
+  // Delete related rows first to satisfy foreign key constraints
+  await db.delete(cartItemsTable).where(eq(cartItemsTable.phoneId, id));
+  await db.delete(orderItemsTable).where(eq(orderItemsTable.phoneId, id));
   await db.delete(phonesTable).where(eq(phonesTable.id, id));
   res.sendStatus(204);
 });

@@ -102,8 +102,17 @@ export default function Admin() {
 
   const deletePhone = async (id: number) => {
     if (!confirm("Энэ утасны бүтээгдэхүүнийг устгах уу?")) return;
-    await fetch(`/api/phones/${id}`, { method: "DELETE", credentials: "include" });
-    setPhones((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const res = await fetch(`/api/phones/${id}`, { method: "DELETE", credentials: "include" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Устгах үед алдаа гарлаа" }));
+        alert(err.error || "Устгах үед алдаа гарлаа");
+        return;
+      }
+      setPhones((prev) => prev.filter((p) => p.id !== id));
+    } catch {
+      alert("Сервертэй холбогдоход алдаа гарлаа");
+    }
   };
 
   const addPhone = async (e: React.FormEvent) => {
