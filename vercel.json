@@ -3,6 +3,14 @@
   "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "node artifacts/api-server/build-vercel.mjs && pnpm --filter @workspace/phone-store run build",
   "outputDirectory": "artifacts/phone-store/dist/public",
+  "headers": [
+    {
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index" },
     { "source": "/(.*)", "destination": "/index.html" }

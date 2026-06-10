@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,16 +26,26 @@ const queryClient = new QueryClient({
 });
 
 class ErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean; message: string }
+  { children: ReactNode; locationKey: string },
+  { hasError: boolean; message: string; prevKey: string }
 > {
-  constructor(props: { children: ReactNode }) {
+  constructor(props: { children: ReactNode; locationKey: string }) {
     super(props);
-    this.state = { hasError: false, message: "" };
+    this.state = { hasError: false, message: "", prevKey: props.locationKey };
   }
 
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, message: error?.message ?? String(error) };
+  }
+
+  static getDerivedStateFromProps(
+    props: { locationKey: string },
+    state: { hasError: boolean; message: string; prevKey: string }
+  ) {
+    if (props.locationKey !== state.prevKey) {
+      return { hasError: false, message: "", prevKey: props.locationKey };
+    }
+    return null;
   }
 
   render() {
@@ -52,10 +62,10 @@ class ErrorBoundary extends Component<
               {this.state.message}
             </pre>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => { window.location.href = "/"; }}
               className="bg-primary text-primary-foreground px-6 py-2 rounded-full font-medium hover:bg-primary/90"
             >
-              Дахин ачааллах
+              Нүүр хуудас руу
             </button>
           </div>
         </div>
@@ -65,46 +75,47 @@ class ErrorBoundary extends Component<
   }
 }
 
-function Router() {
+function RouterWithBoundary() {
+  const [location] = useLocation();
   return (
-    <Switch>
-      <Route path="/admin" component={Admin} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-1">
-            <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/shop" component={Shop} />
-              <Route path="/phone/:id" component={PhoneDetail} />
-              <Route path="/cart" component={Cart} />
-              <Route path="/orders" component={Orders} />
-              <Route component={NotFound} />
-            </Switch>
-          </main>
-          <Footer />
-        </div>
-      </Route>
-    </Switch>
+    <ErrorBoundary locationKey={location}>
+      <Switch>
+        <Route path="/admin" component={Admin} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-1">
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/shop" component={Shop} />
+                <Route path="/phone/:id" component={PhoneDetail} />
+                <Route path="/cart" component={Cart} />
+                <Route path="/orders" component={Orders} />
+                <Route component={NotFound} />
+              </Switch>
+            </main>
+            <Footer />
+          </div>
+        </Route>
+      </Switch>
+    </ErrorBoundary>
   );
 }
 
 function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <RouterWithBoundary />
             <Toaster />
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+          </WouterRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
