@@ -69,8 +69,8 @@ export default function Cart() {
     );
   }
 
-  const isEmpty = !cartItems || cartItems.length === 0;
-  const subtotal = cartItems?.reduce((acc, item) => acc + (item.phone.price * item.quantity), 0) || 0;
+  const isEmpty = !Array.isArray(cartItems) || cartItems.length === 0;
+  const subtotal = Array.isArray(cartItems) ? cartItems.reduce((acc, item) => acc + (item.phone.price * item.quantity), 0) : 0;
 
   return (
     <div className="min-h-screen pt-24 pb-20">
