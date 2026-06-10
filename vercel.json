@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "node artifacts/api-server/build-vercel.mjs && pnpm --filter @workspace/phone-store run build",
   "outputDirectory": "artifacts/phone-store/dist/public",
   "rewrites": [
