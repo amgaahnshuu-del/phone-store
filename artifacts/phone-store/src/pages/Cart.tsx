@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useGetCart, useRemoveFromCart, getGetCartQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, ArrowRight, ShoppingBag, Package } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Trash2, ArrowRight, ShoppingBag, Package, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,7 @@ export default function Cart() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [placing, setPlacing] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleRemove = (id: number) => {
     removeMutation.mutate(
@@ -39,6 +41,8 @@ export default function Cart() {
       const res = await fetch("/api/orders", {
         method: "POST",
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -151,6 +155,18 @@ export default function Cart() {
                   <span className="font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
                     ₮{subtotal.toLocaleString()}
                   </span>
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+                    <Phone className="w-4 h-4" /> Утасны дугаар
+                  </label>
+                  <Input
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="99xxxxxx"
+                    className="bg-background border-white/10"
+                  />
                 </div>
 
                 {!user && (

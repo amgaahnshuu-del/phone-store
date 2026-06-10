@@ -65,9 +65,11 @@ router.post("/orders", async (req, res): Promise<void> => {
 
   const total = cartItems.reduce((sum, item) => sum + item.phone.price * item.quantity, 0);
 
+  const phoneNumber = typeof req.body?.phoneNumber === "string" ? req.body.phoneNumber.trim() : null;
+
   const [order] = await db
     .insert(ordersTable)
-    .values({ userId: req.session.userId, total, status: "pending" })
+    .values({ userId: req.session.userId, total, status: "pending", phoneNumber })
     .returning();
 
   await db.insert(orderItemsTable).values(

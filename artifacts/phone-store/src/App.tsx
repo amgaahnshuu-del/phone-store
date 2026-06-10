@@ -9,6 +9,7 @@ import Shop from "@/pages/Shop";
 import PhoneDetail from "@/pages/PhoneDetail";
 import Cart from "@/pages/Cart";
 import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import Orders from "@/pages/Orders";
 import Admin from "@/pages/Admin";
 import { Navbar } from "@/components/Navbar";
@@ -21,6 +22,7 @@ function Router() {
     <Switch>
       <Route path="/admin" component={Admin} />
       <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route>
         <div className="flex flex-col min-h-screen">
           <Navbar />

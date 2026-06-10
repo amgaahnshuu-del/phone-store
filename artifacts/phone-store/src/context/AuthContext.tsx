@@ -10,10 +10,32 @@ type AuthContextType = {
   user: AuthUser | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<AuthUser>;
+  register: (username: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+async function authenticate(
+  path: string,
+  username: string,
+  password: string,
+  fallbackError: string,
+): Promise<AuthUser> {
+  const res = await fetch(path, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || fallbackError);
+  }
+
+  return res.json();
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -28,17 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (username: string, password: string): Promise<AuthUser> => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || "Нэвтрэх үед алдаа гарлаа");
-    }
-    const data = await res.json();
+    const data = await authenticate("/api/auth/login", username, password, "Нэвтрэх үед алдаа гарлаа");
+    setUser(data);
+    return data;
+  };
+
+  const register = async (username: string, password: string): Promise<AuthUser> => {
+    const data = await authenticate("/api/auth/register", username, password, "Бүртгүүлэх үед алдаа гарлаа");
     setUser(data);
     return data;
   };
@@ -49,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

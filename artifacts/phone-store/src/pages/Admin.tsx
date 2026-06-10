@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import {
   Loader2, Package, ShoppingBag, CheckCircle, XCircle,
-  Clock, Trash2, Plus, LogOut, LayoutDashboard, ChevronDown, ChevronUp
+  Clock, Trash2, Plus, LogOut, LayoutDashboard, ChevronDown, ChevronUp, ImagePlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +65,7 @@ export default function Admin() {
   const [form, setForm] = useState<typeof emptyPhone>(emptyPhone);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
   const { data: categories } = useListCategories();
 
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function Admin() {
         imageUrl: form.imageUrl,
         description: form.description || null,
         specs: form.specs || null,
-        categoryId: parseInt(form.categoryId),
+        categoryId: form.categoryId ? parseInt(form.categoryId) : (categories?.[0]?.id ?? 1),
         featured: form.featured,
         inStock: form.inStock,
         color: form.color || null,
@@ -135,12 +136,25 @@ export default function Admin() {
       const newPhone = await res.json();
       setPhones((prev) => [...prev, newPhone]);
       setForm(emptyPhone);
+      setImagePreview("");
       setShowAddPhone(false);
     } catch (err: any) {
       setFormError(err.message);
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      setImagePreview(result);
+      setForm((prev) => ({ ...prev, imageUrl: result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   if (authLoading || loadingData) {
@@ -237,6 +251,9 @@ export default function Admin() {
                       <div className="font-bold">Захиалга #{order.id}</div>
                       <div className="text-sm text-muted-foreground">
                         {order.username} · {new Date(order.createdAt).toLocaleString("mn-MN")}
+                        {(order as any).phoneNumber && (
+                          <span className="ml-2 text-primary font-medium">📞 {(order as any).phoneNumber}</span>
+                        )}
                       </div>
                     </div>
                     <StatusBadge status={order.status} />
@@ -316,7 +333,19 @@ export default function Admin() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs text-muted-foreground">Брэнд *</label>
-                    <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="Apple" required className="bg-background border-white/10" />
+                    <select
+                      value={form.brand}
+                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                      required
+                      className="w-full h-10 rounded-lg bg-background border border-white/10 px-3 text-sm text-foreground"
+                    >
+                      <option value="">Брэнд сонгох...</option>
+                      <option value="Apple">Apple</option>
+                      <option value="Samsung">Samsung</option>
+                      <option value="Xiaomi">Xiaomi</option>
+                      <option value="Huawei">Huawei</option>
+                      <option value="Oppo">Oppo</option>
+                    </select>
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs text-muted-foreground">Үнэ (₮) *</label>
@@ -327,22 +356,27 @@ export default function Admin() {
                     <Input type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} placeholder="4000000" className="bg-background border-white/10" />
                   </div>
                   <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs text-muted-foreground">Зургийн URL *</label>
-                    <Input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." required className="bg-background border-white/10" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Ангилал *</label>
-                    <select
-                      value={form.categoryId}
-                      onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                      required
-                      className="w-full h-10 rounded-lg bg-background border border-white/10 px-3 text-sm text-foreground"
-                    >
-                      <option value="">Сонгох...</option>
-                      {categories?.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                    <label className="text-xs text-muted-foreground">Зураг *</label>
+                    <div className="flex items-center gap-3">
+                      {imagePreview ? (
+                        <img src={imagePreview} alt="preview" className="w-16 h-16 object-contain rounded-xl bg-background border border-white/10 p-1 shrink-0" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl bg-background border border-white/10 flex items-center justify-center shrink-0">
+                          <ImagePlus className="w-6 h-6 text-muted-foreground/40" />
+                        </div>
+                      )}
+                      <label className="flex-1 flex items-center justify-center h-10 rounded-lg bg-background border border-white/10 border-dashed cursor-pointer hover:border-primary/50 hover:text-primary transition-colors px-3 text-sm text-muted-foreground gap-2">
+                        <ImagePlus className="w-4 h-4" />
+                        {imagePreview ? "Зураг солих" : "Зураг сонгох"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          required={!form.imageUrl}
+                        />
+                      </label>
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs text-muted-foreground">Хадгалах хэмжээ</label>
@@ -381,7 +415,7 @@ export default function Admin() {
                     <Button type="submit" className="bg-primary hover:bg-primary/90" disabled={saving}>
                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Хадгалах"}
                     </Button>
-                    <Button type="button" variant="outline" className="border-white/10" onClick={() => { setShowAddPhone(false); setForm(emptyPhone); }}>
+                    <Button type="button" variant="outline" className="border-white/10" onClick={() => { setShowAddPhone(false); setForm(emptyPhone); setImagePreview(""); }}>
                       Болих
                     </Button>
                   </div>

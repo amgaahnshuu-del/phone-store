@@ -48,6 +48,9 @@ Thumbs.db
 .cache/
 .local/
 
+# Vercel build output (generated during vercel build)
+/api/
+
 # Environment secrets
 .env
 .env.*

@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type ErrorRequestHandler, type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
@@ -31,8 +31,8 @@ app.use(
   }),
 );
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(
   session({
@@ -49,5 +49,27 @@ app.use(
 );
 
 app.use("/api", router);
+
+const apiErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  logger.error(
+    {
+      err,
+      req: {
+        method: req.method,
+        url: req.originalUrl,
+      },
+    },
+    "Unhandled API error",
+  );
+
+  if (res.headersSent) {
+    next(err);
+    return;
+  }
+
+  res.status(500).json({ error: "Серверийн алдаа гарлаа" });
+};
+
+app.use(apiErrorHandler);
 
 export default app;

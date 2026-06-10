@@ -25,14 +25,16 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           {webglAvailable && (
             <WebGLErrorBoundary>
-              <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-                <ambientLight intensity={0.2} />
-                <directionalLight position={[10, 10, 5]} intensity={1} color="#00f0ff" />
-                <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#b000ff" />
+              <Canvas camera={{ position: [0, 0, 5.5], fov: 42 }}>
+                <ambientLight intensity={0.25} color="#FFFFFF" />
+                <directionalLight position={[4, 8, 5]} intensity={2.2} color="#FFF6EE" />
+                <directionalLight position={[-5, 3, 2]} intensity={1.0} color="#A0D8FF" />
+                <directionalLight position={[2, -4, -6]} intensity={0.7} color="#8030FF" />
+                <spotLight position={[0, 6, 4]} intensity={2.5} color="#FFFFFF" angle={0.5} penumbra={1} />
                 <Suspense fallback={null}>
                   <ParticleBackground />
-                  <Phone3DModel interactive={false} scale={0.8} />
-                  <Environment preset="city" />
+                  <Phone3DModel interactive={false} scale={0.82} />
+                  <Environment preset="studio" />
                 </Suspense>
               </Canvas>
             </WebGLErrorBoundary>
@@ -180,7 +182,7 @@ export default function Home() {
               {
                 icon: <Shield className="w-10 h-10 text-secondary" />,
                 title: "Баталгаат хугацаа",
-                description: "Бүх утсанд 1-2 жилийн албан ёсны баталгаа олгоно."
+                description: "Бүх утсанд 1-2 сарийн албан ёсны баталгаа олгоно."
               },
               {
                 icon: <Battery className="w-10 h-10 text-primary" />,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { Loader2, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -95,18 +95,11 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
-            <p className="text-xs text-muted-foreground text-center">Туршилтын данс:</p>
-            <div className="grid grid-cols-2 gap-2 text-xs text-center">
-              <div className="bg-background rounded-lg p-2 border border-white/5">
-                <div className="font-bold text-primary">Admin</div>
-                <div className="text-muted-foreground">admin / admin123</div>
-              </div>
-              <div className="bg-background rounded-lg p-2 border border-white/5">
-                <div className="font-bold text-secondary">Хэрэглэгч</div>
-                <div className="text-muted-foreground">testuser / user123</div>
-              </div>
-            </div>
+          <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Шинэ хэрэглэгч үү?</span>
+            <Link href="/register" className="text-primary hover:underline font-medium">
+              Бүртгүүлэх
+            </Link>
           </div>
         </div>
       </motion.div>

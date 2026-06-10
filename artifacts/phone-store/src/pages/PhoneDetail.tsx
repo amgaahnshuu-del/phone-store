@@ -126,7 +126,7 @@ export default function PhoneDetail() {
                 <div className="flex items-center gap-3 bg-background border border-white/10 p-4 rounded-xl">
                   <ShieldCheck className="w-6 h-6 text-primary" />
                   <div>
-                    <div className="text-sm font-bold">1 жилийн баталгаа</div>
+                    <div className="text-sm font-bold">1 сарийн баталгаа</div>
                     <div className="text-xs text-muted-foreground">Албан ёсны</div>
                   </div>
                 </div>

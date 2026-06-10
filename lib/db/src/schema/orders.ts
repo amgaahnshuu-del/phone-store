@@ -7,6 +7,7 @@ export const ordersTable = pgTable("orders", {
   userId: integer("user_id").notNull().references(() => usersTable.id),
   status: text("status").notNull().default("pending"),
   total: real("total").notNull(),
+  phoneNumber: text("phone_number"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

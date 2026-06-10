@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, X, Smartphone, Package, LogOut, LayoutDashboard, LogIn } from "lucide-react";
+import { ShoppingCart, Menu, X, Package, LogOut, LayoutDashboard, LogIn } from "lucide-react";
 import { useGetCart } from "@workspace/api-client-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
@@ -22,9 +22,9 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-primary font-bold text-xl tracking-wider">
-          <Smartphone className="w-6 h-6" />
-          ГарУтас
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/annie-logo.jpg" alt="Annie Annie" className="h-10 w-10 rounded-full object-cover" />
+          <span className="font-bold text-xl tracking-wider text-primary">Annie Annie</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
