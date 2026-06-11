@@ -77,5 +77,9 @@
     "vite": "catalog:",
     "wouter": "^3.3.5",
     "zod": "catalog:"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.0"
   }
 }
