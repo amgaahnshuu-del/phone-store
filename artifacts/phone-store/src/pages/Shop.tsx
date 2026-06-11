@@ -19,11 +19,13 @@ export default function Shop() {
   const [categoryId, setCategoryId] = useState<number | null>(null);
 
   const { data: categories } = useListCategories();
+  const categoryList = Array.isArray(categories) ? categories : [];
   
   const { data: phones, isLoading } = useListPhones({
     search: debouncedSearch || undefined,
     categoryId: categoryId || undefined
   });
+  const phoneList = Array.isArray(phones) ? phones : [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +70,7 @@ export default function Shop() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Бүх ангилал</SelectItem>
-                {categories?.map((cat) => (
+                {categoryList.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -81,9 +83,9 @@ export default function Shop() {
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
           </div>
-        ) : phones && phones.length > 0 ? (
+        ) : phoneList.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {phones.map((phone, index) => (
+            {phoneList.map((phone, index) => (
               <motion.div
                 key={phone.id}
                 initial={{ opacity: 0, scale: 0.9 }}

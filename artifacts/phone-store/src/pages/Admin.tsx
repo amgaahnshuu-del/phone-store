@@ -67,6 +67,7 @@ export default function Admin() {
   const [formError, setFormError] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const { data: categories } = useListCategories();
+  const categoryList = Array.isArray(categories) ? categories : [];
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "admin")) {
@@ -128,7 +129,7 @@ export default function Admin() {
         imageUrl: form.imageUrl,
         description: form.description || null,
         specs: form.specs || null,
-        categoryId: form.categoryId ? parseInt(form.categoryId) : (categories?.[0]?.id ?? 1),
+        categoryId: form.categoryId ? parseInt(form.categoryId) : (categoryList[0]?.id ?? 1),
         featured: form.featured,
         inStock: form.inStock,
         color: form.color || null,

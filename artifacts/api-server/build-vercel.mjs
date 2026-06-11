@@ -3,22 +3,24 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { copyFile, mkdir } from "node:fs/promises";
+import { copyFile, mkdir, rm } from "node:fs/promises";
 
 globalThis.require = createRequire(import.meta.url);
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 const apiDir = path.resolve(artifactDir, "..", "..", "api");
+const runtimeApiDir = path.resolve(apiDir, "runtime");
 
 async function buildVercel() {
-  await mkdir(apiDir, { recursive: true });
+  await rm(runtimeApiDir, { recursive: true, force: true });
+  await mkdir(runtimeApiDir, { recursive: true });
 
   await esbuild({
     entryPoints: { index: path.resolve(artifactDir, "src/handler.ts") },
     platform: "node",
     bundle: true,
     format: "esm",
-    outdir: apiDir,
+    outdir: runtimeApiDir,
     outExtension: { ".js": ".mjs" },
     logLevel: "info",
     external: [
@@ -58,10 +60,10 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   );
   await copyFile(
     path.resolve(connectPgSimpleDir, "table.sql"),
-    path.resolve(apiDir, "table.sql"),
+    path.resolve(runtimeApiDir, "table.sql"),
   );
 
-  console.log("Vercel API bundle written to", apiDir);
+  console.log("Vercel API bundle written to", runtimeApiDir);
 }
 
 buildVercel().catch((err) => {

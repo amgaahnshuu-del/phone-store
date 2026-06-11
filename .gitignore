@@ -49,7 +49,10 @@ Thumbs.db
 .local/
 
 # Vercel build output (generated during vercel build)
-/api/
+/api/*
+!/api/
+!/api/index.mjs
+/api/runtime/
 
 # Environment secrets
 .env

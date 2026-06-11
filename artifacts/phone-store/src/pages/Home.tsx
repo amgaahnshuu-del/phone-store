@@ -14,9 +14,28 @@ import { isWebGLAvailable } from "@/hooks/use-webgl";
 
 const webglAvailable = isWebGLAvailable();
 
+type PhoneStats = {
+  totalProducts: number;
+  totalBrands: number;
+  inStockCount: number;
+};
+
+function isPhoneStats(value: unknown): value is PhoneStats {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      "totalProducts" in value &&
+      "totalBrands" in value &&
+      "inStockCount" in value,
+  );
+}
+
 export default function Home() {
   const { data: featuredPhones } = useGetFeaturedPhones();
   const { data: stats } = useGetPhoneStats();
+  const featuredPhoneList = Array.isArray(featuredPhones) ? featuredPhones : [];
+  const phoneStats = isPhoneStats(stats) ? stats : null;
 
   return (
     <div className="min-h-screen pt-16 flex flex-col">
@@ -75,7 +94,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      {stats && (
+      {phoneStats && (
         <section className="py-20 border-b border-white/5 relative z-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -85,7 +104,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg"
               >
-                <div className="text-4xl font-bold text-primary mb-2">{stats.totalProducts}+</div>
+                <div className="text-4xl font-bold text-primary mb-2">{phoneStats.totalProducts}+</div>
                 <div className="text-sm text-muted-foreground uppercase tracking-wider">Гар утас</div>
               </motion.div>
               <motion.div 
@@ -95,7 +114,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg"
               >
-                <div className="text-4xl font-bold text-secondary mb-2">{stats.totalBrands}</div>
+                <div className="text-4xl font-bold text-secondary mb-2">{phoneStats.totalBrands}</div>
                 <div className="text-sm text-muted-foreground uppercase tracking-wider">Брэнд</div>
               </motion.div>
               <motion.div 
@@ -105,7 +124,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
                 className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg"
               >
-                <div className="text-4xl font-bold text-primary mb-2">{stats.inStockCount}</div>
+                <div className="text-4xl font-bold text-primary mb-2">{phoneStats.inStockCount}</div>
                 <div className="text-sm text-muted-foreground uppercase tracking-wider">Бэлэн байгаа</div>
               </motion.div>
               <motion.div 
@@ -124,7 +143,7 @@ export default function Home() {
       )}
 
       {/* Featured Products */}
-      {featuredPhones && featuredPhones.length > 0 && (
+      {featuredPhoneList.length > 0 && (
         <section className="py-24 relative z-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-end mb-12">
@@ -140,7 +159,7 @@ export default function Home() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredPhones.map((phone, index) => (
+              {featuredPhoneList.map((phone, index) => (
                 <motion.div
                   key={phone.id}
                   initial={{ opacity: 0, y: 30 }}
