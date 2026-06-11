@@ -11,6 +11,10 @@ const PgSession = connectPgSimple(session);
 
 const app: Express = express();
 
+// Vercel terminates HTTPS before the function sees the request, so Express
+// needs to trust the proxy in order to treat session cookies as secure.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
