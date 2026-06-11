@@ -28,9 +28,9 @@ export function Footer() {
           <div>
             <h4 className="text-foreground font-bold mb-4">Холбоо барих</h4>
             <ul className="space-y-2">
-              <li className="text-muted-foreground text-sm">Утас: +976 8888 9999</li>
-              <li className="text-muted-foreground text-sm">И-мэйл: info@garutas.mn</li>
-              <li className="text-muted-foreground text-sm">Хаяг: Улаанбаатар хот, Сүхбаатар дүүрэг</li>
+              <li className="text-muted-foreground text-sm">Утас: +976 8055 2166</li>
+              <li className="text-muted-foreground text-sm">Instagram: @garutasxeelinhudaldaa</li>
+              <li className="text-muted-foreground text-sm">Хаяг: Улаанбаатар хот</li>
             </ul>
           </div>
         </div>
